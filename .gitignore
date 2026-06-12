@@ -1,0 +1,11 @@
+.env
+smtp.py
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+.vscode
