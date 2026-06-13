@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr
-from typing import Optional
+from typing import Optional,Dict, Any
 
 
 class UserCreate(BaseModel):
@@ -27,3 +27,9 @@ class UserRead(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str = "bearer"
+
+
+class NoteCreate(BaseModel):
+    title: str
+    content: Dict[str, Any]
+    collection_id: Optional[int] = None

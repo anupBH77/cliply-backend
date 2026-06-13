@@ -1,1 +1,2 @@
-# Empty __init__.py to make routers a package
+from . import auth
+from . import notes

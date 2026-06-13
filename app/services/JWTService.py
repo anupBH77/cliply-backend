@@ -1,10 +1,7 @@
 from datetime import datetime, timedelta
 from jose import jwt
 
-SECRET_KEY = "super-secret-key"
-ALGORITHM = "HS256"
-
-ACCESS_TOKEN_EXPIRE_MINUTES = 15
+from app.config.env_config import SECRET_KEY,ALGORITHM,ACCESS_TOKEN_EXPIRE_MINUTES
 REFRESH_TOKEN_EXPIRE_DAYS = 30
 
 
@@ -36,3 +33,12 @@ def create_refresh_token(user_id: int):
         SECRET_KEY,
         algorithm=ALGORITHM,
     )
+    
+def verify_token(token: str, token_type: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        if payload.get("type") != token_type:
+            return None
+        return payload.get("sub")
+    except jwt.JWTError:
+        return None

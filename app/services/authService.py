@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 import random
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status,Response,Request
 from sqlalchemy import select
 from passlib.context import CryptContext
 
@@ -9,7 +9,8 @@ from app.models.otp import OTP
 from app.schemas.schemas import UserCreate,UserLogin,OTPCreate
 from app.db.db import db_dependency
 from app.services.mailService import GMailService
-
+from app.services.JWTService import create_access_token,verify_token
+from app.config.env_config import ACCESS_TOKEN_EXPIRE_MINUTES
 
 pwd_context = CryptContext(
     schemes=["argon2"],
@@ -125,7 +126,7 @@ async def verify_email_using_otp(payload: OTPCreate, db: db_dependency):
 
     return {"message": "Email verified successfully"}
 
-async def authenticate_user(db: db_dependency,user_login:UserLogin ):
+async def login_user(db: db_dependency,user_login:UserLogin,response:Response ):
     user = await db.scalar(
         select(User).where(User.email == user_login.email)
     )
@@ -135,5 +136,23 @@ async def authenticate_user(db: db_dependency,user_login:UserLogin ):
 
     if not pwd_context.verify(user_login.password, user.password_hash):
         return None
+    access_token = create_access_token(user.id)
 
+    response.set_cookie(
+        "auth_id", access_token, httponly=True, max_age=ACCESS_TOKEN_EXPIRE_MINUTES * 60
+    )
+    
+    return user
+
+async def authenticate_user(db: db_dependency, request:Request):
+    auth_id = request.cookies.get("auth_id")
+   
+    if not auth_id:
+        return None
+    user_id = verify_token(auth_id, "access")
+    if not user_id:
+        return None
+    user = await db.scalar(
+        select(User).where(User.id == user_id)
+    )
     return user
