@@ -5,6 +5,8 @@ from app.db.db import engine
 
 from app.routers.auth import router as auth_router
 from app.routers.notes import router as notes_router
+from app.routers.collections import router as collections_router
+from app.routers.tasks import router as tasks_router
 app = FastAPI(
     title="My API",
     version="1.0.0",
@@ -23,7 +25,8 @@ app.add_middleware(
 
 app.include_router(auth_router)
 app.include_router(notes_router)
-
+app.include_router(collections_router)
+app.include_router(tasks_router)
 @app.get("/")
 def root():
     return {"message": "Hello FastAPI"}
