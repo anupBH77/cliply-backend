@@ -47,6 +47,19 @@ class Note(Base):
         onupdate=func.now()
     )
     
+    is_archived: Mapped[bool] = mapped_column(
+        default=False
+    )
+    
+    is_deleted: Mapped[bool] = mapped_column(
+        default=False
+    )
+    
+    deleted_at: Mapped[datetime | None] = mapped_column(
+        DateTime,
+        nullable=True
+    )
+    
 class Collection(Base):
     __tablename__ = "collections"
 
@@ -85,6 +98,8 @@ class Task(Base):
     primary_key=True,
     default=uuid4
     )
+    
+    
 
     user_id: Mapped[UUID] = mapped_column(
         PG_UUID(as_uuid=True),

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, status,Request
 from app.schemas.schemas import NoteCreate
-from app.services.notesService import create_note,update_note,get_note,get_notes
+from app.services.notesService import create_note,update_note,get_note,get_notes,delete_note,archive_note,restore_note,unarchive_note,get_archived_notes,get_deleted_notes
 from app.db.db import db_dependency
 from app.services.authService import authenticate_user
 from app.models.users import User
@@ -28,7 +28,7 @@ async def create_note_route(
     }
 @router.get("/")
 async def list_notes_route(db: db_dependency, request: Request, current_user: User = Depends(authenticate_user)):
-    notes = await get_notes(user_id=current_user.id, db=db)
+    notes = await get_notes(user_id=current_user.id, db=db,request=request)
     return notes
 @router.get("/{note_id}")
 async def get_note_route(note_id: str, db: db_dependency, request: Request, current_user: User = Depends(authenticate_user)):
@@ -49,3 +49,24 @@ async def update_note_route(note_id: str, payload: NoteCreate, db: db_dependency
         "content": note.content,
         "collection_id": note.collection_id,
     }
+    
+@router.delete("/{note_id}")
+async def delete_note_route(note_id: str, db: db_dependency, request: Request, current_user: User = Depends(authenticate_user)):
+    note = await delete_note(note_id=note_id, user_id=current_user.id, db=db)
+    return {"message": "Note deleted successfully"}
+
+@router.patch("/{note_id}/restore")
+async def restore_note_route(note_id: str, db: db_dependency, request: Request, current_user: User = Depends(authenticate_user)):
+    note = await restore_note(note_id=note_id, user_id=current_user.id, db=db)
+    return {"message": "Note restored successfully"}
+
+@router.patch("/{note_id}/unarchive")
+async def unarchive_note_route(note_id: str, db: db_dependency, request: Request, current_user: User = Depends(authenticate_user)):
+    note = await unarchive_note(note_id=note_id, user_id=current_user.id, db=db)
+    return {"message": "Note unarchived successfully"}
+
+@router.patch("/{note_id}/archive")
+async def archive_note_route(note_id: str, db: db_dependency, request: Request, current_user: User = Depends(authenticate_user)):
+    note = await archive_note(note_id=note_id, user_id=current_user.id, db=db)
+    return {"message": "Note archived successfully"}
+
