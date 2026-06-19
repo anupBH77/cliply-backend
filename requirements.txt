@@ -10,5 +10,6 @@ resend
 httpx
 jinja2
 asyncpg
-argon2-cffi 
+argon2-cffi
+pydantic[email]
 passlib[argon2]
