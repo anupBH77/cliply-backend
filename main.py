@@ -7,6 +7,7 @@ from app.routers.auth import router as auth_router
 from app.routers.notes import router as notes_router
 from app.routers.collections import router as collections_router
 from app.routers.tasks import router as tasks_router
+from app.config.env_config import APP_URL
 app = FastAPI(
     title="My API",
     version="1.0.0",
@@ -15,8 +16,7 @@ app = FastAPI(
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
+        APP_URL
     ],
     allow_credentials=True,
     allow_methods=["*"],
